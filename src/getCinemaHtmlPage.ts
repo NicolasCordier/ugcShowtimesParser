@@ -1,9 +1,9 @@
 import { parse } from 'node-html-parser';
 
-export default async function getCinemaHtmlPage(cinemaId: string, date: Date) {
+export default async function getCinemaHtmlPage(cinemaId: string | number, date: Date) {
     const searchDate = date.toISOString().slice(0, 10);
     const url = new URL('https://www.ugc.fr/showingsCinemaAjaxAction!getShowingsForCinemaPage.action');
-    url.searchParams.append('cinemaId', cinemaId);
+    url.searchParams.append('cinemaId', `${cinemaId}`);
     url.searchParams.append('date', searchDate);
 
     const fetched = await fetch(url);

@@ -4,7 +4,7 @@ import getApiResult from './getApiResult';
 import getCinemaHtmlPage from './getCinemaHtmlPage';
 import { ParsedCinemas, ParsedMovieDetails } from './types';
 
-export default async function apiHandler(cinemaIds: string[], searchStart: Date, searchEnd: Date) {
+export default async function apiHandler(cinemaIds: (string | number)[], searchStart: Date, searchEnd: Date) {
     const cinemaPages = await Promise.all(cinemaIds.map((cinemaId) => getCinemaHtmlPage(cinemaId, searchStart)));
     const parsedCinemas = cinemaPages.reduce((parsedCinemas: ParsedCinemas, page) => {
         const parsedCinema = extractScreeningHours(page, searchStart, searchEnd);

@@ -43,3 +43,12 @@ export type ParsedMovieDetails = Record<string, {
     description: string;
     thumbnailUrl: string | null;
 }>;
+
+export interface Period {
+    start: Date;
+    end: Date;
+}
+export interface Filters {
+    cinemaIds: number[];
+    period: Period;
+}

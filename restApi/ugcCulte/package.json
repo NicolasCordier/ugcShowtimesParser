@@ -1,0 +1,25 @@
+{
+    "name": "ugcshowtimesparser",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/lambdaHandler.js",
+    "scripts": {
+        "build": "rimraf dist && tsc",
+        "test": "npm run build && node -r dotenv/config dist/test.js",
+        "package:clean": "rimraf package.zip package_dir/*.js",
+        "package:copy": "copyfiles -f package*.json dist/*.js package_dir",
+        "package:install": "cd package_dir && npm i --only=prod",
+        "package:zip": "7z a package.zip ./package_dir/*",
+        "package": "npm run package:clean && npm run package:copy && npm run package:install && npm run package:zip"
+    },
+    "author": "Nicolas Cordier",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.111",
+        "@types/node": "^18.14.1",
+        "copyfiles": "^2.4.1",
+        "dotenv": "^16.0.3",
+        "rimraf": "~3.0.2",
+        "typescript": "^4.9.5"
+    }
+}

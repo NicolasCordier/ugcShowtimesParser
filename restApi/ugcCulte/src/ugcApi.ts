@@ -94,7 +94,7 @@ async function getMovieShowingsAtDate(movieId: number, date: string, cinemaIds?:
                     lang: showingLang,
                     cinema: {
                         id: cinemaId,
-                        name: cinemaName,
+                        name: cinemaName.trim(), // The API sometime returns untrimed names
                     }
                 };
             });

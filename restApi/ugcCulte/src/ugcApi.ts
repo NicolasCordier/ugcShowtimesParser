@@ -1,19 +1,11 @@
 import { Movie, Showing } from "./types";
-import { validateValue } from "./utils";
+import { getResponseJson, validateValue } from "./utils";
 
 //
 // UGC Rest API requires a valid Accept-Language header or it sends back a 500 status code.
 // By default, fetch sets the header to "Accept-Language: *" which is considered invalid.
 //
 const headers = { 'Accept-Language': 'fr-FR' };
-
-async function getResponseJson(response: Response) {
-    if (response.status >= 200 && response.status < 300) {
-        return response.json();
-    }
-
-    throw new Error(`Unexpected status code ${response.status}: ${await response.text()}`);
-}
 
 export async function getMovies(cinemaIds?: number[]) {
     const labels = ["UGC Culte"];

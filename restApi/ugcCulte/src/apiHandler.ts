@@ -19,6 +19,7 @@ export type ApiResultRecord = {
     
         showings: {
             id: number;
+            startDate: Date;
             startDateFR: string;
             endDateFR: string;
             lang: string | null;
@@ -54,6 +55,7 @@ export default async function apiHandler(cinemaIds: number[]): Promise<ApiResult
                     movieUrl: `https://www.ugc.fr/film.html?id=${movie.id}`,
                     showings: showings.map((showing) => ({
                         id: showing.id,
+                        startDate: showing.start,
                         startDateFR: getFrenchStartDate(showing.start),
                         endDateFR: getFrenchEndDate(showing.end),
                         lang: showing.lang,
@@ -85,11 +87,13 @@ export default async function apiHandler(cinemaIds: number[]): Promise<ApiResult
 
             currentMovie.showings.push({
                 id: showing.id,
+                startDate: showing.startDate,
                 startDateFR: showing.startDateFR,
                 endDateFR: showing.endDateFR,
                 lang: showing.lang,
                 bookingUrl: showing.bookingUrl,
             });
+            currentMovie.showings = currentMovie.showings.sort((a, b) => a.startDate > b.startDate ? 1 : -1);
             cinemaMovies[movie.id] = currentMovie;
 
             cinemas[showing.cinemaId] = {

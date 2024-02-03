@@ -1,6 +1,10 @@
 import apiHandler from './apiHandler';
+import { reportMoviesToDiscord } from './discord';
+import { cinemaIds } from './params';
 
-apiHandler([7, 10, 20]).then((movies) =>
-{
-    console.log('movies', JSON.stringify(movies, undefined, 2))
-})
+(async () => {
+    const cinemaMovies = await apiHandler(cinemaIds);
+    console.log('cinemaMovies', JSON.stringify(cinemaMovies, undefined, 2));
+
+    await reportMoviesToDiscord(cinemaMovies);
+})();

@@ -13,6 +13,7 @@ export type MoviesApiResult = {
 
     showings: {
         id: number;
+        startDate: Date;
         startDateFR: string;
         endDateFR: string;
         lang: string | null;
@@ -63,6 +64,7 @@ export type ApiResult = {
     
         showings: {
             id: number;
+            startDate: Date;
             startDateFR: string;
             endDateFR: string;
             lang: string | null;
@@ -71,3 +73,35 @@ export type ApiResult = {
         }[];
     }[];
 }[];
+
+export type EmbedMessage = {
+    title: string;
+    url: string;
+    description: string;
+    fields: EmbedMessageField[];
+    thumbnail?: {
+        url: string;
+    };
+}
+
+export type EmbedMessageField = {
+    name: string;
+    value: string;
+    inline?: boolean;
+}
+
+
+export type DiscordMessage = {
+    id: string;
+    content: string;
+    embeds: EmbedMessage[];
+    timestamp: string;
+}
+
+export type PostDiscordMessage = {
+    username: string;
+} & ({
+    content: string;
+} | {
+    embeds: EmbedMessage[];
+})

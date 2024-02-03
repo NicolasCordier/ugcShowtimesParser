@@ -1,4 +1,4 @@
-export type ApiResult = {
+export type MoviesApiResult = {
     id: number;
     thumbnailUrl: URL | null;
     name: string;
@@ -35,8 +35,6 @@ export type Movie = {
     durationFR: string | null;
 };
 
-export type Movies = Record<number, Movie>
-
 export type Showing = {
     id: number;
     start: Date;
@@ -47,3 +45,29 @@ export type Showing = {
         name: string;
     }
 }
+
+export type ApiResult = {
+    cinemaId: number;
+    cinemaName: string;
+
+    movies: {
+        id: number;
+        thumbnailUrl: URL | null;
+        name: string;
+        genders: string | null;
+        directors: string | null;
+        actors: string | null;
+        description: string | null;
+        releaseDateFR: string | null;
+        durationFR: string | null;
+    
+        showings: {
+            id: number;
+            startDateFR: string;
+            endDateFR: string;
+            lang: string | null;
+    
+            bookingUrl: string;
+        }[];
+    }[];
+}[];

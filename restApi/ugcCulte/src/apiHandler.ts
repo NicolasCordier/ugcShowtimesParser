@@ -1,26 +1,34 @@
-import { ApiResult, Movie, Showing } from './types';
+import { MoviesApiResult, Movie, Showing, ApiResult } from './types';
 import { getMovies, getMovieShowings } from './ugcApi';
+import { getFrenchStartDate, getFrenchEndDate } from './utils';
 
-function getFrenchStartDate(date: Date) {
-    return new Intl.DateTimeFormat('fr-FR', {
-        weekday: 'long',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        timeZone: 'Europe/Paris',
-    }).format(date);
+export type ApiResultRecord = {
+    cinemaId: number;
+    cinemaName: string;
+
+    movies: Record<number, {
+        id: number;
+        thumbnailUrl: URL | null;
+        name: string;
+        genders: string | null;
+        directors: string | null;
+        actors: string | null;
+        description: string | null;
+        releaseDateFR: string | null;
+        durationFR: string | null;
+    
+        showings: {
+            id: number;
+            startDateFR: string;
+            endDateFR: string;
+            lang: string | null;
+    
+            bookingUrl: string;
+        }[];
+    }>;
 }
 
-function getFrenchEndDate(date: Date) {
-    return new Intl.DateTimeFormat('fr-FR', {
-        hour: 'numeric',
-        minute: '2-digit',
-        timeZone: 'Europe/Paris',
-    }).format(date);
-}
-
-export default async function apiHandler(cinemaIds: number[]) {
+export default async function apiHandler(cinemaIds: number[]): Promise<ApiResult> {
     const movies = await getMovies(cinemaIds);
 
     const moviePromises = Object.values(movies).map<Promise<[Movie, Showing[]]>>(async (movie) => {
@@ -28,7 +36,7 @@ export default async function apiHandler(cinemaIds: number[]) {
     })
     const promiseResults = await Promise.allSettled(moviePromises);
 
-    const result = promiseResults.reduce((resolved, promiseResult) => {
+    const movieCinemaShowings = promiseResults.reduce((resolved, promiseResult) => {
         if (promiseResult.status === 'fulfilled') {
             const [movie, showings] = promiseResult.value;
             if (showings.length > 0)
@@ -57,7 +65,46 @@ export default async function apiHandler(cinemaIds: number[]) {
             }
         }
         return resolved;
-    }, [] as ApiResult);
+    }, [] as MoviesApiResult);
 
-    return result;
+    const cinemaMoviesMap = movieCinemaShowings.reduce((cinemas, movie) => {
+        movie.showings.forEach((showing) => {
+            const cinemaMovies = (cinemas[showing.cinemaId] ?? {}).movies ?? {};
+            const currentMovie: ApiResultRecord["movies"][0] = cinemaMovies[movie.id] ?? {
+                id: movie.id,
+                thumbnailUrl: movie.thumbnailUrl,
+                name: movie.name,
+                genders: movie.genders,
+                directors: movie.directors,
+                actors: movie.actors,
+                description: movie.description,
+                releaseDateFR: movie.releaseDateFR,
+                durationFR: movie.durationFR,
+                showings: [],
+            };
+
+            currentMovie.showings.push({
+                id: showing.id,
+                startDateFR: showing.startDateFR,
+                endDateFR: showing.endDateFR,
+                lang: showing.lang,
+                bookingUrl: showing.bookingUrl,
+            });
+            cinemaMovies[movie.id] = currentMovie;
+
+            cinemas[showing.cinemaId] = {
+                cinemaId: showing.cinemaId,
+                cinemaName: showing.cinemaName,
+                movies: cinemaMovies,
+            }
+        });
+
+        return cinemas;
+    }, {} as Record<number, ApiResultRecord>);
+
+    return Object.values(cinemaMoviesMap).map((cinema) => ({
+        cinemaId: cinema.cinemaId,
+        cinemaName: cinema.cinemaName,
+        movies: Object.values(cinema.movies),
+    }));
 }

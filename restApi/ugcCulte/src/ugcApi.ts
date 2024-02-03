@@ -1,4 +1,4 @@
-import { Movies, Showing } from "./types";
+import { Movie, Showing } from "./types";
 import { validateValue } from "./utils";
 
 //
@@ -15,7 +15,7 @@ async function getResponseJson(response: Response) {
     throw new Error(`Unexpected status code ${response.status}: ${await response.text()}`);
 }
 
-export async function getMovies(cinemaIds?: number[]): Promise<Movies> {
+export async function getMovies(cinemaIds?: number[]) {
     const labels = ["UGC Culte"];
 
     const endpoint = new URL("https://backend.ugc.fr/api/films");
@@ -29,7 +29,7 @@ export async function getMovies(cinemaIds?: number[]): Promise<Movies> {
 
     const movieList = validateValue(response, 'array', 'response', false);
 
-    return movieList.reduce((movies: Movies, movie: any) => {
+    return movieList.reduce((movies: Record<number, Movie>, movie: any) => {
         const movieId = validateValue(movie?.code_ugc, 'number', 'code_ugc', false);
         movies[movieId] = {
             id: movieId,

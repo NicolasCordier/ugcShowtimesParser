@@ -11,6 +11,6 @@
       "moduleResolution": "node",
       "outDir": "dist"
     },
-    "include": ["src/**/*.ts", "src/sendDiscordMessage.tssave", "src/lambdaHandler.tssave"],
+    "include": ["src/**/*.ts"],
     "exclude": ["node_modules", "**/*.spec.ts"]
 }

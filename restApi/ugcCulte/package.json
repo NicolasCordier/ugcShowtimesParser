@@ -2,7 +2,7 @@
     "name": "ugcshowtimesparser",
     "version": "1.0.0",
     "description": "",
-    "main": "dist/lambdaHandler.js",
+    "main": "dist/index.js",
     "scripts": {
         "build": "rimraf dist && tsc",
         "test": "npm run build && node -r dotenv/config dist/test.js",

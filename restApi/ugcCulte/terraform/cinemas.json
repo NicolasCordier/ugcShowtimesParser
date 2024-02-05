@@ -1,0 +1,236 @@
+{
+    "10": {
+        "id": 10,
+        "name": "UGC Ciné Cité Les Halles",
+        "nickname": "les_halles",
+        "address": "Forum des Halles - Niveau -3",
+        "zip": "75001",
+        "city": "PARIS",
+        "position": 3
+    },
+    "20": {
+        "id": 20,
+        "name": "UGC Ciné Cité La Défense",
+        "nickname": "la_défense",
+        "address": "Centre Commercial Les Quatre Temps",
+        "zip": "92092",
+        "city": "PARIS-LA-DEFENSE",
+        "position": 4
+    },
+    "7": {
+        "id": 7,
+        "name": "UGC Ciné Cité Maillot",
+        "nickname": "maillot",
+        "address": "2, place de la Porte Maillot - Palais des Congrès - Niveau -1",
+        "zip": "75017",
+        "city": "PARIS",
+        "position": 5
+    },
+    "53": {
+        "id": 53,
+        "name": "UGC Grand Normandie",
+        "nickname": "grand_normandie",
+        "address": "116 bis, avenue des Champs-Elysées",
+        "zip": "75008",
+        "city": "PARIS",
+        "position": 6
+    },
+    "49": {
+        "id": 49,
+        "name": "Le Cin’Hoche",
+        "nickname": "sartrouville",
+        "address": "6 rue Hoche",
+        "zip": "78500",
+        "city": "SARTROUVILLE",
+        "position": 7
+    },
+    "17": {
+        "id": 17,
+        "name": "UGC Enghien",
+        "nickname": "enghien",
+        "address": "38, rue du Général de Gaulle",
+        "zip": "95880",
+        "city": "ENGHIEN-LES-BAINS",
+        "position": 8
+    },
+    "16": {
+        "id": 16,
+        "name": "UGC Ciné Cité Cergy-le-Haut",
+        "nickname": "cergy_le_haut",
+        "address": "8, place des 3 Gares",
+        "zip": "95800",
+        "city": "CERGY-LE-HAUT",
+        "position": 9
+    },
+    "48": {
+        "id": 48,
+        "name": "C2L Saint Germain",
+        "nickname": "saint_germain",
+        "address": "25-27-29 rue du Vieux Marché",
+        "zip": "78100",
+        "city": "SAINT GERMAIN EN LAYE",
+        "position": 10
+    },
+    "54": {
+        "id": 54,
+        "name": "C2L Poissy",
+        "nickname": "poissy",
+        "address": "112 Rue du Général de Gaulle",
+        "zip": "78300",
+        "city": "POISSY",
+        "position": 11
+    },
+    "2": {
+        "id": 2,
+        "name": "UGC Normandie",
+        "nickname": "normandie",
+        "address": "116 bis, avenue des Champs-Elysées",
+        "zip": "75008",
+        "city": "PARIS",
+        "position": 12
+    },
+    "4": {
+        "id": 4,
+        "name": "UGC Danton",
+        "nickname": "danton",
+        "address": "99, boulevard Saint-Germain",
+        "zip": "75006",
+        "city": "PARIS",
+        "position": 13
+    },
+    "5": {
+        "id": 5,
+        "name": "UGC Gobelins",
+        "nickname": "gobelins",
+        "address": "66 bis, avenue des Gobelins",
+        "zip": "75013",
+        "city": "PARIS",
+        "position": 14
+    },
+    "6": {
+        "id": 6,
+        "name": "UGC Ciné Cité SQY Ouest",
+        "nickname": "sqy_ouest",
+        "address": "1, avenue de la Source de la Bièvre",
+        "zip": "78180",
+        "city": "MONTIGNY-LE-BRETONNEUX",
+        "position": 15
+    },
+    "9": {
+        "id": 9,
+        "name": "UGC Opéra",
+        "nickname": "opéra",
+        "address": "32, boulevard des Italiens",
+        "zip": "75009",
+        "city": "PARIS",
+        "position": 16
+    },
+    "12": {
+        "id": 12,
+        "name": "UGC Ciné Cité Bercy",
+        "nickname": "bercy",
+        "address": "2, cour Saint Emilion",
+        "zip": "75012",
+        "city": "PARIS",
+        "position": 17
+    },
+    "11": {
+        "id": 11,
+        "name": "UGC Lyon Bastille",
+        "nickname": "bastille",
+        "address": "12, rue de Lyon",
+        "zip": "75012",
+        "city": "PARIS",
+        "position": 18
+    },
+    "13": {
+        "id": 13,
+        "name": "UGC Odéon",
+        "nickname": "odéon",
+        "address": "124, boulevard Saint-Germain",
+        "zip": "75006",
+        "city": "PARIS",
+        "position": 19
+    },
+    "14": {
+        "id": 14,
+        "name": "UGC Montparnasse",
+        "nickname": "montparnasse",
+        "address": "83, boulevard du Montparnasse",
+        "zip": "75006",
+        "city": "PARIS",
+        "position": 20
+    },
+    "15": {
+        "id": 15,
+        "name": "UGC Rotonde",
+        "nickname": "rotonde",
+        "address": "103, boulevard du Montparnasse",
+        "zip": "75006",
+        "city": "PARIS",
+        "position": 21
+    },
+    "37": {
+        "id": 37,
+        "name": "UGC Ciné Cité Paris 19",
+        "nickname": "paris_19",
+        "address": "166, Boulevard Macdonald",
+        "zip": "75019",
+        "city": "PARIS",
+        "position": 22
+    },
+    "40": {
+        "id": 40,
+        "name": "UGC Roxane",
+        "nickname": "roxane",
+        "address": "6 Rue Saint-Simon",
+        "zip": "78000",
+        "city": "VERSAILLES",
+        "position": 23
+    },
+    "41": {
+        "id": 41,
+        "name": "UGC Cyrano",
+        "nickname": "cyrano",
+        "address": "7 Rue Rameau",
+        "zip": "78000",
+        "city": "VERSAILLES",
+        "position": 24
+    },
+    "43": {
+        "id": 43,
+        "name": "UGC Ciné Cité Vélizy",
+        "nickname": "vélizy",
+        "address": "Centre Commercial Régional Vélizy 2",
+        "zip": "78140",
+        "city": "VELIZY VILLACOUBLAY",
+        "position": 25
+    },
+    "44": {
+        "id": 44,
+        "name": "UGC Ciné Cité Parly",
+        "nickname": "parly",
+        "address": "2 Avenue Charles de Gaulle",
+        "zip": "78150",
+        "city": "LE CHESNAY",
+        "position": 26
+    },
+    "55": {
+        "id": 55,
+        "name": "UGC Plaisir",
+        "nickname": "plaisir",
+        "address": "Centre Commercial Mon Grand Plaisir - 1170 Avenue de Saint-Germain",
+        "zip": "78370",
+        "city": "PLAISIR",
+        "position": 27
+    },
+    "59": {
+        "id": 59,
+        "name": "UGC Issy-les-Moulineaux",
+        "nickname": "issy_les_moulineaux",
+        "address": "8 Promenade Cœur de Ville",
+        "zip": "92130",
+        "city": "Issy-les-Moulineaux",
+        "position": 28
+    }
+}

@@ -164,9 +164,3 @@ resource "discord_channel_permission" "everyone_index" {
   # We need to add permissions to bot before removing to everyone to avoid soft lock
   depends_on = [discord_channel_permission.bot_index]
 }
-
-######## DEBUG! TODO: remove me
-resource "local_file" "foo" {
-  content  = jsonencode({for id, channel in discord_text_channel.cinemas : id => channel.id})
-  filename = "${path.module}/debug.txt"
-}

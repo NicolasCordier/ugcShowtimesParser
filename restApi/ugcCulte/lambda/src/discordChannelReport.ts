@@ -123,11 +123,11 @@ export async function reportMovieToChannel(channelId: string, cinemaId: number, 
             description: movie.description || '-',
             thumbnail: thumbnail,
             fields: getOptionalFields([
-                { name: 'Date de sortie', value: movie.releaseDateFR, inline: true },
                 { name: 'Genres', value: movie.genders, inline: true },
                 { name: 'Réalisateurs', value: movie.directors, inline: true },
                 { name: 'Acteurs', value: movie.actors, inline: true },
                 { name: 'Durée', value: movie.durationFR, inline: true },
+                { name: 'Date de sortie', value: movie.releaseDateFR, inline: true },
                 ...movie.showings.map((s) => ({
                     name: `${s.lang} - ${s.startDateFR} (fin ${s.endDateFR})`,
                     value: `[Réserver](${s.bookingUrl})`,

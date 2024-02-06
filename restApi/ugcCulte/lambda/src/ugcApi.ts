@@ -7,11 +7,24 @@ import { getResponseJson, validateValue } from "./utils";
 //
 const headers = { 'Accept-Language': 'fr-FR' };
 
-export async function getMovies(cinemaIds?: number[]) {
-    const labels = ["UGC Culte"];
+const date1yearAgo = new Date();
+date1yearAgo.setFullYear(date1yearAgo.getFullYear() - 1);
+const timestamp1YearAgo = date1yearAgo.getTime();
 
+export async function getMovies(cinemaIds?: number[]) {
     const endpoint = new URL("https://backend.ugc.fr/api/films");
-    endpoint.searchParams.set('labels', labels.join(','));
+
+    //
+    // Some old movies are rerun in cinema theaters without having the "UGC Cultes" label
+    // Because they have another label (such as "100 ans Warner")
+    // Or because they are rerun during a special event (ex: Love Festival)
+    // So instead we consider a movie to be old if it was released > 1 year ago
+    //
+    // Keep legacy code here as the search param filter itself still works:
+    // const labels = ["UGC Culte"];
+    // endpoint.searchParams.set('labels', labels.join(','));
+    //
+
     if (cinemaIds && cinemaIds.length > 0) {
         endpoint.searchParams.set('cinemas', cinemaIds.join(','));
     }
@@ -23,16 +36,21 @@ export async function getMovies(cinemaIds?: number[]) {
 
     return movieList.reduce((movies: Record<number, Movie>, movie: any) => {
         const movieId = validateValue(movie?.code_ugc, 'number', 'code_ugc', false);
-        movies[movieId] = {
-            id: movieId,
-            name: validateValue(movie?.titre, 'string', 'titre', false),
-            description: validateValue(movie?.synopsis, 'string', 'synopsis', true),
-            thumbnailUrl: validateValue(movie?.image_affiche, 'url', 'image_affiche', true),
-            genders: validateValue(movie?.genre, 'string', 'genre', true),
-            directors: validateValue(movie?.realisteur, 'string', 'realisteur', true),
-            actors: validateValue(movie?.acteur, 'string', 'acteur', true),
-            releaseDateFR: validateValue(movie?.date_sortie, 'string', 'date_sortie', true),
-            durationFR: validateValue(movie?.duree, 'string', 'duree', true),
+        const releaseDateTimestamp = validateValue(movie?.date_sortie_timestamp, 'number', 'date_sortie_timestamp', true);
+
+        if (releaseDateTimestamp && releaseDateTimestamp * 1000 < timestamp1YearAgo)
+        {
+            movies[movieId] = {
+                id: movieId,
+                name: validateValue(movie?.titre, 'string', 'titre', false),
+                description: validateValue(movie?.synopsis, 'string', 'synopsis', true),
+                thumbnailUrl: validateValue(movie?.image_affiche, 'url', 'image_affiche', true),
+                genders: validateValue(movie?.genre, 'string', 'genre', true),
+                directors: validateValue(movie?.realisteur, 'string', 'realisteur', true),
+                actors: validateValue(movie?.acteur, 'string', 'acteur', true),
+                releaseDateFR: validateValue(movie?.date_sortie, 'string', 'date_sortie', true),
+                durationFR: validateValue(movie?.duree, 'string', 'duree', true),
+            }
         }
         return movies;
     }, {});

@@ -20,6 +20,7 @@ async function performDiscordRequest(...params: Parameters<typeof fetch>) {
             const response = await httpResponse.json();
 
             const retryAfter = validateValue(response?.retry_after, 'number', 'discord api rate limit "retry_after"', false);
+            console.log(`Discord rate limited. Retrying in ${retryAfter}s`);
             await waitFor(retryAfter * 1000);
         }
         else {

@@ -52,6 +52,12 @@ resource "discord_text_channel" "index" {
 resource "discord_message" "hash" {
   channel_id = discord_text_channel.debug.id
   content    = "{}"
+
+  lifecycle {
+    ignore_changes = [
+      content, # The content is dynamically updated by the lambda. We shouldn't override it when redeploying
+    ]
+  }
 }
 
 resource "discord_message" "index" {

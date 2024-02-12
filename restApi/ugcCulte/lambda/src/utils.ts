@@ -141,14 +141,18 @@ export function convertCinemasDataToRecord(data: CinemasData) {
     }, {} as Record<number, CinemasData[0]["data"]>)
 };
 
-export function splitToChunks<T>(data: T[], chunkSize: number): T[][] {
-    const chunks: T[][] = [];
-
-    for (let i = 0; i < data.length / chunkSize; i++) {
-        const chunkStart = i * data.length;
-        const chunkEnd = chunkStart + chunkSize;
-        chunks.push(data.slice(chunkStart, chunkEnd));
+export function splitToChunks<T>(array: T[], size: number): T[][] {
+    if (size <= 0) {
+        throw new Error(`Invalid chunk size ${size}`);
     }
 
-    return chunks;
+    return array.reduce((chunks: T[][], item, index) => {
+        if (index % size === 0) {
+            chunks.push([item]);
+        }
+        else {
+            chunks[Math.floor(index / size)].push(item);
+        }
+        return chunks;
+    }, [])
 }

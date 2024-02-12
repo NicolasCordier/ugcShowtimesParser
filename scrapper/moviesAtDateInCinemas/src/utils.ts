@@ -9,12 +9,12 @@ export function splitIntoChunks<T>(array: T[], size: number): T[][] {
         throw new Error(`Invalid chunk size ${size}`);
     }
 
-    return array.reduce((chunks: T[][], chunk, index) => {
+    return array.reduce((chunks: T[][], item, index) => {
         if (index % size === 0) {
-            chunks.push([chunk]);
+            chunks.push([item]);
         }
         else {
-            chunks[Math.floor(index / size)].push(chunk);
+            chunks[Math.floor(index / size)].push(item);
         }
         return chunks;
     }, [])

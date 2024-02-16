@@ -17,7 +17,7 @@ type DiscordChannelMovie = {
     discordEmbed: EmbedMessage;
 }
 
-const fieldUrlExtractorReg = /\[.*\]\((.*)\)/g;
+const fieldUrlExtractorReg = /\[.*\]\((.*)\)/;
 async function getDiscordChannelMovies(channelId: string) {
     const messages = await getDiscordChannelMessages(channelId);
 

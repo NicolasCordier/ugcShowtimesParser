@@ -1,14 +1,8 @@
 import { deleteDiscordMessage, getDiscordChannelMessages, sendDiscordMessage, updateDiscordMessage } from "./discordApi";
 import { discordCinemasChannels } from "./params";
+import { splitDiscordEmbeds } from "./splitDiscordEmbeds";
 import { ApiResult, EmbedMessage, EmbedMessageField } from "./types";
 import { splitToChunks } from "./utils";
-
-//
-// TODO: Set to 10 and edit the split to chunk function to make sure
-// The sum off embed don't exceed 6000 characters
-//
-const MAX_DISCORD_EMBEDS_PER_MSG = 5;
-const MAX_EMBEDS_CHARS_PER_MSG = 6000;
 
 type DiscordChannelMovie = {
     messageId: string;
@@ -158,28 +152,30 @@ function getOptionalFields(fields: OptionalField[]): EmbedMessageField[]
 }
 
 export async function reportMoviesToChannel(channelId: string, cinemaId: number, movies: ApiMovie[]) {
-    const moviesChunks = splitToChunks(movies, MAX_DISCORD_EMBEDS_PER_MSG);
+    const embeds = movies.map((movie) => ({
+        title: movie.name,
+        url: `https://www.ugc.fr/film.html?id=${movie.id}&cinemaId=${cinemaId}`,
+        description: movie.description || '-',
+        thumbnail: movie.thumbnailUrl ? { url: movie.thumbnailUrl.toString() } : undefined,
+        fields: getOptionalFields([
+            { name: 'Genres', value: movie.genders, inline: true },
+            { name: 'Réalisateurs', value: movie.directors, inline: true },
+            { name: 'Acteurs', value: movie.actors, inline: true },
+            { name: 'Durée', value: movie.durationFR, inline: true },
+            { name: 'Date de sortie', value: movie.releaseDateFR, inline: true },
+            ...movie.showings.map((s) => ({
+                name: `${s.lang} - ${s.startDateFR} (fin ${s.endDateFR})`,
+                value: `[Réserver](${s.bookingUrl})`,
+            })),
+        ]),
+    }));
 
-    for (const movieChunk of moviesChunks) {
+    const embedsChunks = splitDiscordEmbeds(embeds);
+
+    for (const embedsChunk of embedsChunks) {
         await sendDiscordMessage(channelId, {
             username: 'UGC',
-            embeds: movieChunk.map((movie) => ({
-                title: movie.name,
-                url: `https://www.ugc.fr/film.html?id=${movie.id}&cinemaId=${cinemaId}`,
-                description: movie.description || '-',
-                thumbnail: movie.thumbnailUrl ? { url: movie.thumbnailUrl.toString() } : undefined,
-                fields: getOptionalFields([
-                    { name: 'Genres', value: movie.genders, inline: true },
-                    { name: 'Réalisateurs', value: movie.directors, inline: true },
-                    { name: 'Acteurs', value: movie.actors, inline: true },
-                    { name: 'Durée', value: movie.durationFR, inline: true },
-                    { name: 'Date de sortie', value: movie.releaseDateFR, inline: true },
-                    ...movie.showings.map((s) => ({
-                        name: `${s.lang} - ${s.startDateFR} (fin ${s.endDateFR})`,
-                        value: `[Réserver](${s.bookingUrl})`,
-                    })),
-                ]),
-            })),
+            embeds: embedsChunk,
         });
     }
 }

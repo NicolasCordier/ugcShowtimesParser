@@ -156,3 +156,10 @@ export function splitToChunks<T>(array: T[], size: number): T[][] {
         return chunks;
     }, [])
 }
+
+export function computeSum(arr: number[]) {
+    return arr.reduce((sum, item) => {
+        sum += item;
+        return sum;
+    }, 0);
+}

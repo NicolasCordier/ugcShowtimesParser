@@ -62,11 +62,35 @@ function compareMovies(current: DiscordChannelMovie, expected: ApiMovie) {
     const expectedIncludesCurrent = current.showingIds.every((showingId) => expectedIds.includes(showingId));
     const currentIncludesExpected = expectedIds.every((showingId) => current.showingIds.includes(showingId));
 
-    return expectedIncludesCurrent && currentIncludesExpected;
+    return {
+        shouldDelete: !currentIncludesExpected, // There are more/different showings
+        shouldEdit: !expectedIncludesCurrent, // There are less showings (probably passed showings)
+    };
+}
+
+function convertToDiscordEmbed(movie: ApiMovie, cinemaId: number) {
+    return {
+        title: movie.name,
+        url: `https://www.ugc.fr/film.html?id=${movie.id}&cinemaId=${cinemaId}`,
+        description: movie.description || '-',
+        thumbnail: movie.thumbnailUrl ? { url: movie.thumbnailUrl.toString() } : undefined,
+        fields: getOptionalFields([
+            { name: 'Genres', value: movie.genders, inline: true },
+            { name: 'Réalisateurs', value: movie.directors, inline: true },
+            { name: 'Acteurs', value: movie.actors, inline: true },
+            { name: 'Durée', value: movie.durationFR, inline: true },
+            { name: 'Date de sortie', value: movie.releaseDateFR, inline: true },
+            ...movie.showings.map((s) => ({
+                name: `${s.lang} - ${s.startDateFR} (fin ${s.endDateFR})`,
+                value: `[Réserver](${s.bookingUrl})`,
+            })),
+        ]),
+    };
 }
 
 type TaintedMessageReduce = {
-    tainted: Record<number, DiscordChannelMovie>,
+    toDelete: Record<number, DiscordChannelMovie>,
+    toEdit: Record<number, DiscordChannelMovie>,
     untainted: Record<number, DiscordChannelMovie>,
 }
 
@@ -81,24 +105,30 @@ type DiscordComparisonResult = {
     newMovies: ApiMovie[]; 
 }
 
-async function compareWithDiscord(channelId: string, cinemaMovies: ApiResult[0]): Promise<DiscordComparisonResult> {
-    const currentMovies = await getDiscordChannelMovies(channelId);
-
+export function _compareWithDiscord(
+    currentMovies: DiscordChannelMovie[],
+    cinemaMovies: ApiResult[0],
+): DiscordComparisonResult {
     const newMoviesR = cinemaMovies.movies.reduce((movies, movie) => {
         movies[movie.id] = movie;
         return movies;
     }, {} as Record<number, ApiMovie>);
 
-    const { tainted, untainted } = currentMovies.reduce((movies, movie) => {
-        if (newMoviesR[movie.movieId] && compareMovies(movie, newMoviesR[movie.movieId])) {
-            movies.untainted[movie.movieId] = movie;
+    const { toDelete, toEdit, untainted } = currentMovies.reduce((movies, movie) => {
+        const comparison = newMoviesR[movie.movieId] && compareMovies(movie, newMoviesR[movie.movieId]);
+
+        if (!comparison || comparison.shouldDelete) {
+            movies.toDelete[movie.movieId] = movie;
+        } else if (comparison.shouldEdit) {
+            movies.toEdit[movie.movieId] = movie;
         } else {
-            movies.tainted[movie.movieId] = movie;
+            movies.untainted[movie.movieId] = movie;
         }
         return movies;
-    }, { tainted: {}, untainted: {} } as TaintedMessageReduce);
+    }, { toDelete: {}, untainted: {}, toEdit: {} } as TaintedMessageReduce);
 
-    const taintedMessageIds = new Set(Object.values(tainted).map((movie) => movie.messageId));
+    const toDeleteMessageIds = new Set(Object.values(toDelete).map((movie) => movie.messageId));
+    const toEditMessageIds = new Set(Object.values(toEdit).map((movie) => movie.messageId));
     const untaintedMessageIds = new Set(Object.values(untainted).map((movie) => movie.messageId));
 
     //
@@ -106,17 +136,21 @@ async function compareWithDiscord(channelId: string, cinemaMovies: ApiResult[0])
     // Edit messages to remove tainted embeds
     // Delete messages without any embeds anymore
     //
-    const messageIdsToDelete = new Set([...taintedMessageIds].filter((messageId) => !untaintedMessageIds.has(messageId))); // Difference
-    const messageIdsToEdit = new Set([...untaintedMessageIds].filter((messageId) => untaintedMessageIds.has(messageId)));  // Intersection
-
-    const messagesToEditR = Object.values(untainted).reduce((messages, movie) => {
-        if (messageIdsToEdit.has(movie.messageId)) {
-            const currentEmbeds = messages[movie.messageId]?.newEmbeds ?? [];
-            messages[movie.messageId] = {
-                id: movie.messageId,
+    const messageIdsToDelete = new Set([...toDeleteMessageIds].filter((messageId) => !untaintedMessageIds.has(messageId))); // Difference
+    const messageIdsToEdit = new Set([
+        ...toEditMessageIds.keys(),
+        ...[...untaintedMessageIds].filter((messageId) => toDeleteMessageIds.has(messageId)) // Intersection
+    ]);
+    
+    const messagesToEditR = Object.values({ ...untainted, ...toEdit }).reduce((messages, discordMovie) => {
+        const movie = newMoviesR[discordMovie.movieId];
+        if (messageIdsToEdit.has(discordMovie.messageId) && movie) {
+            const currentEmbeds = messages[discordMovie.messageId]?.newEmbeds ?? [];
+            messages[discordMovie.messageId] = {
+                id: discordMovie.messageId,
                 newEmbeds: [
                     ...currentEmbeds,
-                    movie.discordEmbed,
+                    convertToDiscordEmbed(movie, cinemaMovies.cinemaId),
                 ],
             };
         }
@@ -127,13 +161,18 @@ async function compareWithDiscord(channelId: string, cinemaMovies: ApiResult[0])
     //
     // Create new movies and recreate tainted movies
     //
-    const newMovies = cinemaMovies.movies.filter((movie) => !untainted[movie.id]);
+    const newMovies = cinemaMovies.movies.filter((movie) => !untainted[movie.id] && !toEdit[movie.id]);
 
     return {
         messageIdsToDelete,
         messagesToEdit,
         newMovies,
     };
+}
+
+async function compareWithDiscord(channelId: string, cinemaMovies: ApiResult[0]): Promise<DiscordComparisonResult> {
+    const currentMovies = await getDiscordChannelMovies(channelId);
+    return _compareWithDiscord(currentMovies, cinemaMovies);
 }
 
 type OptionalField = {
@@ -152,23 +191,7 @@ function getOptionalFields(fields: OptionalField[]): EmbedMessageField[]
 }
 
 export async function reportMoviesToChannel(channelId: string, cinemaId: number, movies: ApiMovie[]) {
-    const embeds = movies.map((movie) => ({
-        title: movie.name,
-        url: `https://www.ugc.fr/film.html?id=${movie.id}&cinemaId=${cinemaId}`,
-        description: movie.description || '-',
-        thumbnail: movie.thumbnailUrl ? { url: movie.thumbnailUrl.toString() } : undefined,
-        fields: getOptionalFields([
-            { name: 'Genres', value: movie.genders, inline: true },
-            { name: 'Réalisateurs', value: movie.directors, inline: true },
-            { name: 'Acteurs', value: movie.actors, inline: true },
-            { name: 'Durée', value: movie.durationFR, inline: true },
-            { name: 'Date de sortie', value: movie.releaseDateFR, inline: true },
-            ...movie.showings.map((s) => ({
-                name: `${s.lang} - ${s.startDateFR} (fin ${s.endDateFR})`,
-                value: `[Réserver](${s.bookingUrl})`,
-            })),
-        ]),
-    }));
+    const embeds = movies.map((movie) => convertToDiscordEmbed(movie, cinemaId));
 
     const embedsChunks = splitDiscordEmbeds(embeds);
 

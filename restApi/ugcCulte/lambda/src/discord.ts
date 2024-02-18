@@ -17,7 +17,10 @@ export async function reportMoviesToDiscord(cinemasMovies: ApiResult) {
     // Use "for of" instead of "Promise.all" to avoid flooding Discord's API
     //
     for (const cinemaId of outdatedCinemaIds) {
-        await reportCinemaMovies(cinemaId, cinemasMoviesR[cinemaId])
+        const cinemaMovies = cinemasMoviesR[cinemaId];
+        if (cinemaMovies) {
+            await reportCinemaMovies(cinemaId, cinemaMovies);
+        }
     }
 
     await updateDiscordCinemasCache(newCache);

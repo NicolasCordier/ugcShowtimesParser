@@ -5,7 +5,8 @@
     "main": "dist/index.js",
     "scripts": {
         "build": "rimraf dist && tsc",
-        "test": "npm run build && node -r dotenv/config dist/test.js",
+        "start": "npm run build && node -r dotenv/config dist/test.js",
+        "test": "vitest",
         "package:clean": "rimraf package.zip package_dir/*.js",
         "package:copy": "copyfiles -f package*.json dist/*.js package_dir",
         "package:install": "cd package_dir && npm i --only=prod",
@@ -20,6 +21,7 @@
         "copyfiles": "^2.4.1",
         "dotenv": "^16.0.3",
         "rimraf": "~3.0.2",
-        "typescript": "^4.9.5"
+        "typescript": "^4.9.5",
+        "vitest": "^1.3.0"
     }
 }
